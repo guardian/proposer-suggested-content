@@ -33,17 +33,19 @@ def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
 
 def checkProximity(phrase, notwords = None):
-    if notwords is not None:
+    if not notwords:
         try:
             result = MODEL.most_similar(positive=phrase.split(),negative=notwords.split())
             return result
         except KeyError:
+            logging.warn("No matches found for: %s", extra=phrase)
             return []
     else:
         try:
             result = MODEL.most_similar(positive=phrase)
             return result
         except KeyError:
+            logging.warn("No matches found for: %s", extra=phrase)
             return []
 
 
@@ -52,7 +54,6 @@ def setup(argv):
         print("./word-2-vec-service <training-set>")
         sys.exit(1)
 
-        global MODEL
     MODEL = loadModel(argv[1])
 
 
