@@ -19,8 +19,7 @@ def check():
     vector = map(checkProximity, phrases)
     transformed = map(lambda xy: {'name': xy[0], 'distance': xy[1]},
                       [val for sublist in vector for val in sublist])
-
-    return jsonify(results = transformed)
+    return jsonify(results = list(transformed))
 
 
 @app.route('/query', methods=['GET'])
