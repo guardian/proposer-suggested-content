@@ -2,11 +2,12 @@ import gensim, logging, sys
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
 
+# needs to be defined
+
+
 app = Flask(__name__)
 CORS(app, resources=r'/*',
      allow_headers='*')
-
-MODEL = None
 
 ## Logger magic
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
@@ -18,8 +19,7 @@ def check():
     vector = map(checkProximity, phrases)
     transformed = map(lambda xy: {'name': xy[0], 'distance': xy[1]},
                       [val for sublist in vector for val in sublist])
-
-    return jsonify(results = transformed)
+    return jsonify(results = list(transformed))
 
 
 @app.route('/query', methods=['GET'])
@@ -33,32 +33,27 @@ def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
 
 def checkProximity(phrase, notwords = None):
+    __MODEL__ = app.config['MODEL']
     if not notwords:
         try:
-            result = MODEL.most_similar(positive=phrase.split(),negative=notwords.split())
+            result = __MODEL__.most_similar(positive=phrase)
             return result
         except KeyError:
-            logging.warn("No matches found for: %s", extra=phrase)
+            logging.warn("No matches found for: %s", phrase)
             return []
     else:
         try:
-            result = MODEL.most_similar(positive=phrase)
+            result = __MODEL__.most_similar(positive=phrase.split(),negative=notwords.split())
             return result
         except KeyError:
-            logging.warn("No matches found for: %s", extra=phrase)
+            logging.warn("No matches found for: %s", phrase)
             return []
 
 
-def setup(argv):
-    if len(argv) != 2:
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
         print("./word-2-vec-service <training-set>")
         sys.exit(1)
 
-    MODEL = loadModel(argv[1])
-
-
-
-
-if __name__ == "__main__":
-    setup(sys.argv)
+    app.config['MODEL'] = loadModel(sys.argv[1])
     app.run()
