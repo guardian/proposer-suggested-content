@@ -1,6 +1,8 @@
 import gensim, logging, sys, os.path
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
+import boto
+from boto.s3.connection import S3Connection
 
 # needs to be defined
 
@@ -35,9 +37,10 @@ def loadModel(binary_name):
         logging.info("Loading binary file from local filesystem...")
         return gensim.models.Word2Vec.load_word2vec_format(binary_name, binary=True)
     else:
-        # get it from S3
         logging.info("Loading binary file from S3...")
-        return
+        path = read_from_s3()
+        # get it from S3
+        return gensim.models.Word2Vec.load_word2vec_format(path, binary=True)
 
 def checkProximity(phrase, notwords = None):
     __MODEL__ = app.config['MODEL']
@@ -55,6 +58,15 @@ def checkProximity(phrase, notwords = None):
         except KeyError:
             logging.warn("No matches found for: %s", phrase)
             return []
+
+def read_from_s3():
+    conn = S3Connection()
+    b = conn.get_bucket('proposer-capi-snapshots')
+    logging.info('found bucket')
+    key = b.get_key('2015-10-15T10:44:08+00:00/capi-phrases.bin')
+    logging.info('persisting file name')
+    key.get_contents_to_filename('capi-phrases.bin')
+    return 'capi-phrases.bin'
 
 
 if __name__ == "__main__":
