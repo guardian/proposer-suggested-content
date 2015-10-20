@@ -1,4 +1,4 @@
-import gensim, logging, sys
+import gensim, logging, sys, os.path
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
 
@@ -6,6 +6,7 @@ from flask.ext.cors import CORS
 
 
 app = Flask(__name__)
+app.config.from_object('config')
 CORS(app, resources=r'/*',
      allow_headers='*')
 
@@ -29,8 +30,14 @@ def query():
     vector = checkProximity(searchword, notwords)
     return jsonify(vector)
 
-def loadModel(filename):
-    return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
+def loadModel(binary_name):
+    if os.path.isfile(binary_name):
+        logging.info("Loading binary file from local filesystem...")
+        return gensim.models.Word2Vec.load_word2vec_format(binary_name, binary=True)
+    else:
+        # get it from S3
+        logging.info("Loading binary file from S3...")
+        return
 
 def checkProximity(phrase, notwords = None):
     __MODEL__ = app.config['MODEL']
@@ -51,9 +58,5 @@ def checkProximity(phrase, notwords = None):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("./word-2-vec-service <training-set>")
-        sys.exit(1)
-
-    app.config['MODEL'] = loadModel(sys.argv[1])
+    app.config['MODEL'] = loadModel(app.config['TRAINING_SET_BINARY'])
     app.run()

@@ -1,0 +1,1 @@
+TRAINING_SET_BINARY="https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/2015-10-15T10%3A44%3A08%2B00%3A00/capi-bump.bin"
