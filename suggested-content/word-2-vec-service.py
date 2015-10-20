@@ -40,14 +40,14 @@ def checkProximity(phrase, notwords = None):
             result = __MODEL__.most_similar(positive=phrase)
             return result
         except KeyError:
-            logging.warn("No matches found for: %s", extra=phrase)
+            logging.warn("No matches found for: %s", phrase)
             return []
     else:
         try:
             result = __MODEL__.most_similar(positive=phrase.split(),negative=notwords.split())
             return result
         except KeyError:
-            logging.warn("No matches found for: %s", extra=phrase)
+            logging.warn("No matches found for: %s", phrase)
             return []
 
 
