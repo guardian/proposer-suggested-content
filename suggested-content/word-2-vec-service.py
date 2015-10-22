@@ -59,4 +59,4 @@ if __name__ == "__main__":
         sys.exit(1)
 
     app.config['MODEL'] = loadModel(sys.argv[1])
-    app.run()
+    app.run(host='0.0.0.0', port=9000)
