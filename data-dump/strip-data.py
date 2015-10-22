@@ -31,7 +31,6 @@ if __name__ == "__main__":
     input_file = args['textfile']
     out_file = input_file + "-stripped"
 
-
     print("Stripping data from: " + str(input_file))
     print("Writing stripped data to: " + str(out_file))
 
