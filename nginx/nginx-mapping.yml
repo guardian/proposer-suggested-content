@@ -1,6 +1,6 @@
 name: suggested-content
 mappings:
   - prefix: suggested-content
-    port: 5000
+    port: 9000 
     domain-root: local.dev-gutools.co.uk
     cert-domain: local.dev-gutools.co.uk
