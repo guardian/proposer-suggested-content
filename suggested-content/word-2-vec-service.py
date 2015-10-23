@@ -1,6 +1,9 @@
 import gensim, logging, sys
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
+import os
+from itertools import izip
+from itertools import count
 
 # needs to be defined
 
@@ -12,6 +15,22 @@ CORS(app, resources=r'/*',
 ## Logger magic
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
+def train_docs():
+
+    f = open('technology/technology-1.txt', 'r')
+    docs = []
+    for line_no,line in izip(count(),f):
+        words = line.split()
+        docs.append(gensim.models.doc2vec.LabeledSentence(words=words, tags=['SENT_%s' % line_no]))
+    # sentence = gensim.models.doc2vec.LabeledSentence(words=f.readline(), tags=['SENT_1'])
+    model = gensim.models.Doc2Vec(docs, size=100, window=8, min_count=5, workers=4)
+    # tmp = model.docvecs.most_similar('SENT_1')
+    # tmp1 = model.most_similar('technology')
+    origin = model.docvecs['SENT_1']
+    word_sims = [('technology', word, score) for word, score in model.most_similar([origin],topn=20)]
+    tag_sims = [('SENT_2', tag, score) for tag, score in model.docvecs.most_similar([origin],topn=20)]
+    results = sorted((tag_sims + word_sims),key=lambda tup: -tup[2])
+    print results[:20]
 
 @app.route('/check-phrases', methods=['POST'])
 def check():
@@ -54,9 +73,9 @@ def checkProximity(phrase, notwords = None):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("./word-2-vec-service <training-set>")
-        sys.exit(1)
-
-    app.config['MODEL'] = loadModel(sys.argv[1])
+    # if len(sys.argv) != 2:
+        # print("./word-2-vec-service <training-set>")
+        # sys.exit(1)
+    train_docs()
+    # app.config['MODEL'] = loadModel(sys.argv[1])
     app.run(host='0.0.0.0', port=9000, threaded=True)
