@@ -12,3 +12,7 @@ dependencies:
 test:
   post:
     - npm run riffraff-artefact
+
+general:
+  artifacts:
+    - "target/riffraff/artifacts.zip"
