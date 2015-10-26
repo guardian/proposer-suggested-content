@@ -15,4 +15,4 @@ test:
 
 general:
   artifacts:
-    - "./target/riffraff/artifacts.zip"
+    - ${HOME}"/proposer-suggested-content/target/riffraff/artifacts.zip"
