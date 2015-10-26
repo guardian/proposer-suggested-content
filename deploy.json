@@ -1,0 +1,39 @@
+
+{
+  "defaultStacks": ["flexible"],
+  "packages": {
+    "proposer-suggested-content" : {
+      "type": "autoscaling",
+      "data": {
+        "bucket": "composer-dist",
+        "publicReadAcl": false
+      }
+    },
+    "proposer-suggested-content-cloudformation" : {
+      "type": "cloud-formation",
+      "fileName": "cloudformation",
+      "data": {
+        "templatePath": "proposer-suggested-content.json",
+        "cloudFormationStackName": "proposer-suggested-content",
+        "prependStackToCloudFormationStackName": false
+      }
+    }
+  },
+  "recipes": {
+    "default": {
+      "depends": ["proposer-suggested-content-cloudformation", "artifactUploadOnly", "deployOnly"]
+    },
+
+    "deployOnly": {
+      "actionsBeforeApp": ["proposer-suggested-content.deploy"]
+    },
+
+    "artifactUploadOnly": {
+      "actionsBeforeApp": ["proposer-suggested-content.uploadArtifacts"]
+    },
+
+    "proposer-suggested-content-cloudformation": {
+      "actions": ["proposer-suggested-content-cloudformation.updateStack"]
+    }
+  }
+}
