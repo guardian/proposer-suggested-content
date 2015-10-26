@@ -1,0 +1,9 @@
+{
+    "name" : "proposer-suggested-content",
+    "scripts": {
+        "riffraff-artefact": "./node_modules/.bin/riffraff-artefact"
+    },
+    "dependencies" : {
+        "node-riffraff-artefact": "^1.3.3"
+    }
+}
