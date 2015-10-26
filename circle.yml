@@ -5,6 +5,10 @@ machine:
   python:
     version: 3.4.3
 
+dependencies:
+  pre:
+    - pip install numpy
+
 test:
   post:
     - npm run riffraff-artefact
