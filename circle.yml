@@ -15,4 +15,4 @@ test:
 
 general:
   artifacts:
-    - "target/riffraff/artifacts.zip"
+    - "./target/riffraff/artifacts.zip"
