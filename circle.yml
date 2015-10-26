@@ -12,7 +12,4 @@ dependencies:
 test:
   post:
     - npm run riffraff-artefact
-
-general:
-  artifacts:
     - mv ${HOME}"/proposer-suggested-content/target/riffraff/artifacts.zip" ${CIRCLE_ARTIFACTS}
