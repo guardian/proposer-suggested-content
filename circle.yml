@@ -9,7 +9,7 @@ dependencies:
   pre:
     - pip install numpy
   post:
-    - cp ~/virtualenvs ~/proposer-suggested-content
+    - cp -R ~/virtualenvs ~/proposer-suggested-content
 test:
   post:
     - npm run riffraff-artefact
