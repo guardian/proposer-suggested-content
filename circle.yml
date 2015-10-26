@@ -4,3 +4,7 @@ machine:
     ARTEFACT_PATH: ${HOME}/${CIRCLE_PROJECT_REPONAME}
   python:
     version: 3.4.3
+
+test:
+  post:
+    - npm run riffraff-artefact
