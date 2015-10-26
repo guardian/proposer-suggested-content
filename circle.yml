@@ -15,4 +15,4 @@ test:
 
 general:
   artifacts:
-    - ${HOME}"/proposer-suggested-content/target/riffraff/artifacts.zip"
+    - mv ${HOME}"/proposer-suggested-content/target/riffraff/artifacts.zip" ${CIRCLE_ARTIFACTS}
