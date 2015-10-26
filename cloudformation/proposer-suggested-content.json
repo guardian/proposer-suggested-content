@@ -39,10 +39,185 @@
     "Mappings": {
         "SSLCertificateId": {
             "Environment": {
-                "CODE": ""
-                "PROD": ""
+                "CODE": "arn:aws:iam::743583969668:server-certificate/sites.code.dev-gutools.co.uk-exp2023-08-15"
+                "PROD": "arn:aws:iam::743583969668:server-certificate/star.gutools.co.uk-exp2018-11-17"
             }
         },
     },
-    "Resources": { }
+    "Resources": {
+        "ProposerSuggestedContentRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": ["ec2.amazonaws.com"]
+                            },
+                            "Action": ["sts:AssumeRole"]
+                        }
+                    ]
+                },
+                "Path": "/"
+            }
+        },
+        "ProposerSuggestedContentDescribeEC2Policy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyName": "ProposerSuggestedContentDescribeEC2Policy",
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": ["EC2:Describe*"],
+                            "Effect": "Allow",
+                            "Resource": "*"
+                        }
+                    ]
+                },
+                "Roles": [{"Ref": "ProposerSuggestedContentRole"}]
+            }
+        },
+        "ProposerSuggestedContentGetDistributablesPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyName": "ProposerSuggestedContentGetDistributablesPolicy",
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": ["s3:GetObject"],
+                            "Resource": ["arn:aws:s3:::composer-dist/*"]
+                        }
+                    ]
+                },
+                "Roles": [{"Ref": "ProposerSuggestedContentRole"}]
+            }
+        },
+        "ProposerSuggestedContentCloudwatchPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyName": "ProposerSuggestedContentCloudwatchPolicy",
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": ["cloudwatch:*"],
+                            "Resource": "*"
+                        }
+                    ]
+                },
+                "Roles": [{"Ref": "ProposerSuggestedContentRole"}]
+            }
+        },
+        "ProposerSuggestedContentInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [{"Ref": "ProposerSuggestedContentRole"}]
+            }
+        },
+        "SSHSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Allow SSH access from the office",
+                "VpcId": {"Ref": "VpcId"},
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "10.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "PingSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Allow pinging of the instance",
+                "VpcId": {"Ref": "VpcId"},
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "icmp",
+                        "FromPort": "8",
+                        "ToPort": "-1",
+                        "CidrIp": "10.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "AppServerSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "application servers",
+                "VpcId": {"Ref": "VpcId"},
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 9098,
+                        "ToPort": 9098,
+                        "CidrIp": "10.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 9098,
+                        "ToPort": 9098,
+                        "SourceSecurityGroupId": {"Ref": "LoadBalancerSecurityGroup"}
+                    }
+                ]
+            }
+        },
+        "LoadBalancerSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "load balancer",
+                "VpcId": {"Ref": "VpcId"},
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": 443,
+                        "ToPort": 443,
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "ProposerSuggestedContentLoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "Properties": {
+                "SecurityGroups": [
+                    {
+                        "Fn::GetAtt": [
+                            "LoadBalancerSecurityGroup",
+                            "GroupId"
+                        ]
+                    }
+                ],
+                "CrossZone": true,
+                "Subnets": {"Ref": "PublicVpcSubnets"},
+                "Listeners": [
+                    {
+                        "LoadBalancerPort": "443",
+                        "InstancePort": "9098",
+                        "Protocol": "HTTPS",
+                        "SSLCertificateId": {
+                            "Fn::FindInMap": [
+                                "SSLCertificateId",
+                                "Environment",
+                                {"Ref": "Stage"}
+                            ]
+                        }
+                    }
+                ],
+                "HealthCheck": {
+                    "Target": "HTTP:5000/healthcheck",
+                    "HealthyThreshold": "2",
+                    "UnhealthyThreshold": "2",
+                    "Interval": "10",
+                    "Timeout": "5"
+                }
+            }
+        },
+    }
 }
