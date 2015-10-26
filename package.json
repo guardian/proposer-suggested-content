@@ -1,0 +1,10 @@
+{
+    "name" : "proposer-suggested-content",
+    "cloudformation": "cloudformation/proposer-suggested-content.json",
+    "scripts": {
+        "riffraff-artefact": "./node_modules/.bin/riffraff-artefact"
+    },
+    "dependencies" : {
+        "node-riffraff-artefact": "^1.3.3"
+    }
+}

@@ -1,0 +1,48 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "proposer-suggested-content",
+    "Parameters": {
+        "KeyName": {
+            "Description": "The EC2 Key Pair to allow SSH access to the instance",
+            "Type": "String",
+            "Default": "composer-team"
+        },
+        "Stage": {
+            "Description": "Environment name",
+            "Type": "String",
+            "AllowedValues": [
+                "PROD",
+                "CODE"
+            ]
+        },
+        "VpcId": {
+            "Description": "ID of the VPC onto which to launch the application eg. vpc-1234abcd",
+            "Type": "String",
+            "Default": "vpc-381fa95d"
+        },
+        "PublicVpcSubnets": {
+            "Description": "Subnets to use in VPC for public internet-facing ELB eg. subnet-abcd1234",
+            "Type": "CommaDelimitedList",
+            "Default": "subnet-c3620fa6,subnet-2b37bd5c,subnet-3667c86f"
+        },
+        "PrivateVpcSubnets": {
+            "Description": "Subnets to use in VPC for private EC2 instances eg. subnet-abcd1234",
+            "Type": "CommaDelimitedList",
+            "Default": "subnet-c2620fa7,subnet-2a37bd5d,subnet-2967c870"
+        },
+        "GuardianIP": {
+            "Description": "Ip range for the office",
+            "Type": "String",
+            "Default": "77.91.248.0/21"
+        }
+    },
+    "Mappings": {
+        "SSLCertificateId": {
+            "Environment": {
+                "CODE": ""
+                "PROD": ""
+            }
+        },
+    },
+    "Resources": { }
+}

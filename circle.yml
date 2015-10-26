@@ -1,0 +1,15 @@
+machine:
+  environment:
+    PATH: ${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin
+    ARTEFACT_PATH: ${HOME}/${CIRCLE_PROJECT_REPONAME}
+  python:
+    version: 3.4.3
+
+dependencies:
+  pre:
+    - pip install numpy
+
+test:
+  post:
+    - npm run riffraff-artefact
+    - mv ${HOME}"/proposer-suggested-content/target/riffraff/artifacts.zip" ${CIRCLE_ARTIFACTS}
