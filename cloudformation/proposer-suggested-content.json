@@ -38,12 +38,12 @@
         "TrainingSetS3Bucket" : {
             "Description": "The bucket in S3 to train the server on",
             "Type": "String",
-            "Default": ""
+            "Default": "proposer-capi-snapshots"
         },
         "TrainingSetS3Url": {
             "Description": "The url to download the training set",
             "Type": "String",
-            "Default": ""
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/2015-10-15T10%3A44%3A08%2B00%3A00/capi-phrases.bin"
         }
     },
     "Mappings": {
