@@ -37,11 +37,13 @@
         },
         "TrainingSetS3Bucket" : {
             "Description": "The bucket in S3 to train the server on",
-            "Type": "String"
+            "Type": "String",
+            "Default": ""
         },
         "TrainingSetS3Url": {
             "Description": "The url to download the training set",
-            "Type": "String"
+            "Type": "String",
+            "Default": ""
         }
     },
     "Mappings": {
