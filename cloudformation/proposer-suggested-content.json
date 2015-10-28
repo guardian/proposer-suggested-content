@@ -34,15 +34,25 @@
             "Description": "Ip range for the office",
             "Type": "String",
             "Default": "77.91.248.0/21"
+        },
+        "TrainingSetS3Bucket" : {
+            "Description": "The bucket in S3 to train the server on",
+            "Type": "String",
+            "Default": "proposer-capi-snapshots"
+        },
+        "TrainingSetS3Url": {
+            "Description": "The url to download the training set",
+            "Type": "String",
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/2015-10-15T10%3A44%3A08%2B00%3A00/capi-phrases.bin"
         }
     },
     "Mappings": {
         "SSLCertificateId": {
             "Environment": {
-                "CODE": "arn:aws:iam::743583969668:server-certificate/sites.code.dev-gutools.co.uk-exp2023-08-15"
+                "CODE": "arn:aws:iam::743583969668:server-certificate/sites.code.dev-gutools.co.uk-exp2023-08-15",
                 "PROD": "arn:aws:iam::743583969668:server-certificate/star.gutools.co.uk-exp2018-11-17"
             }
-        },
+        }
     },
     "Resources": {
         "ProposerSuggestedContentRole": {
@@ -94,6 +104,34 @@
                 "Roles": [{"Ref": "ProposerSuggestedContentRole"}]
             }
         },
+        "ProposerSuggestedContentGetTrainingSetPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyName": "ProposerSuggestedContentGetTrainingSetPolicy",
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": ["s3:GetObject"],
+                            "Resource": [ {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {"Ref": "TrainingSetS3Bucket"},
+                                        "/*"
+                                    ]
+                                ]
+                            }
+                                        ]
+
+                        }
+                    ]
+                },
+                "Roles": [{"Ref": "ProposerSuggestedContentRole"}]
+            }
+        },
+
         "ProposerSuggestedContentCloudwatchPolicy": {
             "Type": "AWS::IAM::Policy",
             "Properties": {
@@ -155,14 +193,14 @@
                 "SecurityGroupIngress": [
                     {
                         "IpProtocol": "tcp",
-                        "FromPort": 9098,
-                        "ToPort": 9098,
+                        "FromPort": 9000,
+                        "ToPort": 9000,
                         "CidrIp": "10.0.0.0/0"
                     },
                     {
                         "IpProtocol": "tcp",
-                        "FromPort": 9098,
-                        "ToPort": 9098,
+                        "FromPort": 9000,
+                        "ToPort": 9000,
                         "SourceSecurityGroupId": {"Ref": "LoadBalancerSecurityGroup"}
                     }
                 ]
@@ -178,7 +216,7 @@
                         "IpProtocol": "tcp",
                         "FromPort": 443,
                         "ToPort": 443,
-                        "CidrIp": "0.0.0.0/0"
+                        "CidrIp": {"Ref": "GuardianIP"}
                     }
                 ]
             }
@@ -188,7 +226,15 @@
             "Properties": {
                 "SecurityGroups": [
                     {
-                        "Fn::GetAtt": [
+                        "Fn::GetAtt":
+
+
+
+
+
+
+
+ [
                             "LoadBalancerSecurityGroup",
                             "GroupId"
                         ]
@@ -199,7 +245,7 @@
                 "Listeners": [
                     {
                         "LoadBalancerPort": "443",
-                        "InstancePort": "9098",
+                        "InstancePort": "9000",
                         "Protocol": "HTTPS",
                         "SSLCertificateId": {
                             "Fn::FindInMap": [
@@ -211,7 +257,7 @@
                     }
                 ],
                 "HealthCheck": {
-                    "Target": "HTTP:5000/healthcheck",
+                    "Target": "HTTP:9000/healthcheck",
                     "HealthyThreshold": "2",
                     "UnhealthyThreshold": "2",
                     "Interval": "10",
@@ -219,5 +265,126 @@
                 }
             }
         },
+        "AutoscalingGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "AvailabilityZones": {"Fn::GetAZs": ""},
+                "VPCZoneIdentifier": {"Ref": "PrivateVpcSubnets"},
+                "LaunchConfigurationName": {"Ref": "ProposerSuggestedContentLaunchConfig"},
+                "MinSize": "1",
+                "MaxSize": "2",
+                "DesiredCapacity": "1",
+                "HealthCheckType": "ELB",
+                "HealthCheckGracePeriod": 1200,
+                "LoadBalancerNames": [{"Ref": "ProposerSuggestedContentLoadBalancer"}],
+                "Tags": [
+                    {
+                        "Key": "Stage",
+                        "Value": {
+                            "Ref": "Stage"
+                        },
+                        "PropagateAtLaunch": "true"
+                    },
+                    {
+                        "Key": "Stack",
+                        "Value": "flexible",
+                        "PropagateAtLaunch": "true"
+                    },
+                    {
+                        "Key": "App",
+                        "Value": "proposer-suggested-content",
+                        "PropagateAtLaunch": "true"
+                    }
+                ]
+            }
+        },
+        "ProposerSuggestedContentLaunchConfig": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Metadata": {
+                "AWS::CloudFormation::Authentication": {
+                    "distributionAuthentication": {
+                        "type": "S3",
+                        "roleName": {"Ref": "ProposerSuggestedContentRole"},
+                        "buckets": ["composer-dist"]
+                    },
+                    "trainingSetAuthentication": {
+                        "type": "S3",
+                        "roleName": {"Ref": "ProposerSuggestedContentRole"},
+                        "buckets": [{"Ref": "TrainingSetS3Bucket"}]
+                    }
+
+                },
+                "AWS::CloudFormation::Init": {
+                    "config": {
+                        "users": {
+                            "proposer-suggested-content": {
+                                "homeDir": "/home/proposer-suggested-content"
+                            }
+                        },
+                        "files": {
+                            "/home/proposer-suggested-content/proposer-suggested-content.tgz": {
+                                "source": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "https://s3-eu-west-1.amazonaws.com/composer-dist/flexible/",
+                                            {"Ref": "Stage"},
+                                            "/proposer-suggested-content/proposer-suggested-content.tgz"
+                                        ]
+                                    ]
+                                },
+                                "authentication": "distributionAuthentication"
+                            },
+                            "/home/proposer-suggested-content/training-set.bin": {
+                                "source" : {"Ref": "TrainingSetS3Url"},
+                                "authenticaion": "trainingSetAuthentication"
+                            }
+
+                        }
+                    }
+                }
+            },
+            "Properties": {
+                "KeyName": {"Ref": "KeyName"},
+                "ImageId": "ami-cf1128b8",
+                "SecurityGroups": [
+                    {"Ref": "AppServerSecurityGroup"},
+                    {"Ref": "SSHSecurityGroup"},
+                    {"Ref": "PingSecurityGroup"}
+                ],
+                "InstanceType": "t2.medium",
+                "IamInstanceProfile": {"Ref": "ProposerSuggestedContentInstanceProfile"},
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash -ev\n",
+                                "apt-get -y update\n",
+                                "locale-gen en_GB.UTF-8\n",
+                                "apt-get -y install python-setuptools\n",
+                                "wget -P /root https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
+                                "\n",
+                                "mkdir -p /root/aws-cfn-bootstrap-latest",
+                                "\n",
+                                "tar xvfz /root/aws-cfn-bootstrap-latest.tar.gz --strip-components=1 -C /root/aws-cfn-bootstrap-latest",
+                                "\n",
+                                "easy_install /root/aws-cfn-bootstrap-latest/",
+                                "\n",
+                                "cfn-init -s ",
+                                {"Ref": "AWS::StackId"},
+                                " -r ProposerSuggestedContentLaunchConfig ",
+                                "  --region ",
+                                {"Ref": "AWS::Region"},
+                                " || error_exit 'Failed to run cfn-init'\n",
+                                "cd /home/proposer-suggested-content\n",
+                                "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
+                                "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/training-set.bin\n > suggested-content/suggested-content.log"
+                            ]
+                        ]
+                    }
+                }
+            }
+        }
     }
 }
