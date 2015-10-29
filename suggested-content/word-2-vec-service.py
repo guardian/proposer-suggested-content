@@ -17,10 +17,11 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 def check():
     phrases = request.json["phrases"]
     logging.info('querying phrases %s' %phrases)
+
     vector = map(checkProximity, phrases)
-    transformed = map(lambda xy: {'name': xy[0], 'distance': xy[1]},
-                      [val for sublist in vector for val in sublist])
-    return jsonify(results = list(transformed))
+    filtered = filter(lambda x: True if x else False, vector)
+    response = list(filtered)
+    return jsonify(results = response)
 
 @app.route('/healthcheck', methods=['GET'])
 def healthcheck():
@@ -37,21 +38,26 @@ def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
 
 def checkProximity(phrase, notwords = None):
+
+    def transformResult(result):
+        tr = map(lambda xy: {'name': xy[0], 'distance': xy[1]}, result)
+        return { phrase : list(tr)}
+
     __MODEL__ = app.config['MODEL']
     if not notwords:
         try:
             result = __MODEL__.most_similar(positive=phrase)
-            logging.info("Matches for %s are %s" %(phrase,result))
-            return result
+            # logging.info("Matches for %s are %s" %(phrase,result))
+            return transformResult(result)
         except KeyError:
-            return []
+            return {}
     else:
         try:
             result = __MODEL__.most_similar(positive=phrase.split(),negative=notwords.split())
-            return result
+            return transformResult(result)
         except KeyError:
             logging.warn("No matches found for: %s", phrase)
-            return []
+            return {}
 
 
 if __name__ == "__main__":
