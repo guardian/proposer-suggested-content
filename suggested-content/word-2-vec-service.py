@@ -16,7 +16,7 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 @app.route('/check-phrases', methods=['POST'])
 def check():
     phrases = request.json["phrases"]
-    logging.info('querying phrases %s' %phrases)
+    logging.info('querying phrases %s', phrases)
 
     vector = map(checkProximity, phrases)
     filtered = filter(lambda x: True if x else False, vector)
@@ -47,7 +47,7 @@ def checkProximity(phrase, notwords = None):
     if not notwords:
         try:
             result = __MODEL__.most_similar(positive=phrase)
-            # logging.info("Matches for %s are %s" %(phrase,result))
+            logging.info("Matches for %s are %s", phrase, result)
             return transformResult(result)
         except KeyError:
             return {}
