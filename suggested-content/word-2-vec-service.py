@@ -23,7 +23,7 @@ def checkPhrases(phrases):
 @app.route('/document/check-phrases', methods=['POST'])
 def documentCheckPhrases():
     document = request.json['document']
-    grams = helpers.ngrams.bigrams(document)
+    grams = set(helpers.ngrams.bigrams(document))
     response = checkPhrases(grams)
     return jsonify(results = response)
 
