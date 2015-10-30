@@ -2,7 +2,7 @@ import gensim, logging, sys
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
 
-import helpers.ngrams
+import helpers.ngrams, helpers.tfidf
 
 # needs to be defined
 
@@ -22,7 +22,7 @@ def checkPhrases(phrases):
 
 @app.route('/document/check-phrases', methods=['POST'])
 def documentCheckPhrases():
-    document = request.json['document']
+    document = request.json['document'].lower()
     grams = set(helpers.ngrams.bigrams(document))
     response = checkPhrases(grams)
     return jsonify(results = response)
