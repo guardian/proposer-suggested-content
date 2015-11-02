@@ -1,10 +1,10 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 def frequencies(corpus):
-    vectorizer = TfidfVectorizer(lowercase=True, min_df=1, ngram_range=(2, 2), stop_words='english')
+    vectorizer = TfidfVectorizer(lowercase=True, min_df=1, ngram_range=(2, 2), stop_words='english', max_features=50)
     X = vectorizer.fit_transform(corpus)
     idf = vectorizer.idf_
-    return dict(zip(vectorizer.get_feature_names(), idf))
+    return dict(zip(vectorizer.get_feature_names(), idf)
 
 
 def filter_fun(freqs, item):
