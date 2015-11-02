@@ -60,7 +60,7 @@ def checkProximity(phrase, notwords = None):
     if not notwords:
         try:
             result = __MODEL__.most_similar(positive=phrase)
-            #logging.info("Matches for %s are %s", phrase, result)
+            logging.info("Matches for %s are %s", phrase, result)
             return transformResult(result)
         except KeyError:
             return {}
