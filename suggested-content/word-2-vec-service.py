@@ -22,7 +22,7 @@ def checkPhrases(phrases):
 
 @app.route('/document/check-phrases', methods=['POST'])
 def documentCheckPhrases():
-    document = request.json['document'].lower()
+    document = request.json['document']
     grams = set(helpers.ngrams.bigrams(document))
     response = checkPhrases(grams)
     return jsonify(results = response)
@@ -60,7 +60,7 @@ def checkProximity(phrase, notwords = None):
     if not notwords:
         try:
             result = __MODEL__.most_similar(positive=phrase)
-            logging.info("Matches for %s are %s", phrase, result)
+            #logging.info("Matches for %s are %s", phrase, result)
             return transformResult(result)
         except KeyError:
             return {}

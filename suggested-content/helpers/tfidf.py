@@ -6,6 +6,14 @@ def frequencies(corpus):
     idf = vectorizer.idf_
     return dict(zip(vectorizer.get_feature_names(), idf))
 
+
+def filter_fun(freqs, item):
+    try:
+        return freqs[item[0]] > 2.5
+    except KeyError:
+        return False
+
 def filter_low_frequency_bigrams(corpus, bigrams):
     freqs = frequencies(corpus)
-    return filter(lambda x: freqs[x[0]] > 1.4, bigrams)
+    print(freqs)
+    return filter(lambda x: filter_fun(freqs, x), bigrams)
