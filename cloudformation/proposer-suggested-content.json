@@ -346,7 +346,7 @@
             },
             "Properties": {
                 "KeyName": {"Ref": "KeyName"},
-                "ImageId": "ami-cf1128b8",
+                "ImageId": "ami-4b27f838",
                 "SecurityGroups": [
                     {"Ref": "AppServerSecurityGroup"},
                     {"Ref": "SSHSecurityGroup"},

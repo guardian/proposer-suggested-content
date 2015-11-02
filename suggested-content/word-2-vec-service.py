@@ -2,6 +2,8 @@ import gensim, logging, sys
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
 
+import helpers.ngrams, helpers.tfidf
+
 # needs to be defined
 
 
@@ -13,14 +15,25 @@ CORS(app, resources=r'/*',
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 
+def checkPhrases(phrases):
+    vector = map(checkProximity, phrases)
+    filtered = filter(lambda x: True if x else False, vector)
+    return list(filtered)
+
+@app.route('/document/check-phrases', methods=['POST'])
+def documentCheckPhrases():
+    document = request.json['document']
+    grams = set(helpers.ngrams.bigrams(document))
+    response = checkPhrases(grams)
+    return jsonify(results = response)
+
+
 @app.route('/check-phrases', methods=['POST'])
 def check():
     phrases = request.json["phrases"]
     logging.info('querying phrases %s', phrases)
 
-    vector = map(checkProximity, phrases)
-    filtered = filter(lambda x: True if x else False, vector)
-    response = list(filtered)
+    response = checkPhrases(phrases)
     return jsonify(results = response)
 
 @app.route('/healthcheck', methods=['GET'])
