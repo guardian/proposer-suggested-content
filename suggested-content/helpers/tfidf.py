@@ -1,10 +1,12 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 def frequencies(corpus):
-    vectorizer = TfidfVectorizer(lowercase=True, min_df=1, ngram_range=(2, 2), stop_words='english', max_features=50)
+    vectorizer = TfidfVectorizer(lowercase=True, min_df=1, ngram_range=(2, 2), stop_words='english')
     X = vectorizer.fit_transform(corpus)
     idf = vectorizer.idf_
-    return dict(zip(vectorizer.get_feature_names(), idf)
+    values = zip(vectorizer.get_feature_names(), idf)
+    return dict(sorted(values, key=lambda x: x[1]))
+
 
 
 def filter_fun(freqs, item):
@@ -15,4 +17,5 @@ def filter_fun(freqs, item):
 
 def filter_low_frequency_bigrams(corpus, bigrams):
     freqs = frequencies(corpus)
+    print(freqs)
     return filter(lambda x: filter_fun(freqs, x), bigrams)
