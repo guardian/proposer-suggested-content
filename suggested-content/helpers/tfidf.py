@@ -17,5 +17,4 @@ def filter_fun(freqs, item):
 
 def filter_low_frequency_bigrams(corpus, bigrams):
     freqs = frequencies(corpus)
-    print(freqs)
     return filter(lambda x: filter_fun(freqs, x), bigrams)
