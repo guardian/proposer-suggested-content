@@ -33,7 +33,6 @@ def documentCheckPhrases():
 def similarDocs():
     doc = request.json["doc"]   
     DOCS.append(gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=['current_doc']))    
-    # sentence = gensim.models.doc2vec.LabeledSentence(words=f.readline(), tags=['SENT_1'])
     model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=4)
     similar_docs = model.docvecs.most_similar('current_doc')
     return jsonify(similar_docs)
