@@ -1,6 +1,8 @@
 import gensim, logging, sys
+import itertools
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
+import json
 
 import helpers.ngrams, helpers.tfidf
 
@@ -60,6 +62,13 @@ def query():
 def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
 
+def loadDocuments(filename):
+		f = open(filename, 'r')
+		for line1,line2 in itertools.izip_longest(*[f]*2):
+				logging.info("processing the document file")
+				DOCS.append(gensim.models.doc2vec.LabeledSentence(words=line2.split(), tags=[line1]))
+				logging.info("finished processing document file")        
+
 def checkProximity(phrase, notwords = None):
 
     def transformResult(result):
@@ -84,9 +93,12 @@ def checkProximity(phrase, notwords = None):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("./word-2-vec-service <training-set>")
+    if len(sys.argv) < 2:
+        print("./word-2-vec-service <training-set> <document-set>")
         sys.exit(1)
 
     app.config['MODEL'] = loadModel(sys.argv[1])
+    if sys.argv[2]:
+        logging.info('document set')
+        app.config['DOCS'] = loadDocuments(sys.argv[2])
     app.run(host='0.0.0.0', port=9000, threaded=True)
