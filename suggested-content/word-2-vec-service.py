@@ -63,11 +63,11 @@ def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
 
 def loadDocuments(filename):
-		f = open(filename, 'r')
-		for line1,line2 in itertools.izip_longest(*[f]*2):
-				logging.info("processing the document file")
-				DOCS.append(gensim.models.doc2vec.LabeledSentence(words=line2.split(), tags=[line1]))
-				logging.info("finished processing document file")        
+	f = open(filename, 'r')
+	for line1,line2 in itertools.izip_longest(*[f]*2):
+		logging.info("processing the document file")
+		DOCS.append(gensim.models.doc2vec.LabeledSentence(words=line2.split(), tags=[line1]))
+		logging.info("finished processing document file")        
 
 def checkProximity(phrase, notwords = None):
 
