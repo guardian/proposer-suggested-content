@@ -1,6 +1,8 @@
 import gensim, logging, sys
+import itertools
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
+import json
 
 import helpers.ngrams, helpers.tfidf
 
@@ -10,6 +12,8 @@ import helpers.ngrams, helpers.tfidf
 app = Flask(__name__)
 CORS(app, resources=r'/*',
      allow_headers='*')
+
+DOCS = []
 
 ## Logger magic
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
@@ -26,6 +30,14 @@ def documentCheckPhrases():
     grams = set(helpers.ngrams.bigrams(document))
     response = checkPhrases(grams)
     return jsonify(results = response)
+
+@app.route('/doc', methods=['POST'])
+def similarDocs():
+    doc = request.json["doc"]   
+    DOCS.append(gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=['current_doc']))    
+    model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=4)
+    similar_docs = model.docvecs.most_similar('current_doc')
+    return jsonify(similar_docs)
 
 
 @app.route('/check-phrases', methods=['POST'])
@@ -49,6 +61,13 @@ def query():
 
 def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
+
+def loadDocuments(filename):
+	f = open(filename, 'r')
+	for line1,line2 in itertools.izip_longest(*[f]*2):
+		logging.info("processing the document file")
+		DOCS.append(gensim.models.doc2vec.LabeledSentence(words=line2.split(), tags=[line1]))
+		logging.info("finished processing document file")        
 
 def checkProximity(phrase, notwords = None):
 
@@ -74,9 +93,12 @@ def checkProximity(phrase, notwords = None):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("./word-2-vec-service <training-set>")
+    if len(sys.argv) < 2:
+        print("./word-2-vec-service <training-set> <document-set>")
         sys.exit(1)
 
     app.config['MODEL'] = loadModel(sys.argv[1])
+    if sys.argv[2]:
+        logging.info('document set')
+        app.config['DOCS'] = loadDocuments(sys.argv[2])
     app.run(host='0.0.0.0', port=9000, threaded=True)
