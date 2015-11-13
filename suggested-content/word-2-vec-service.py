@@ -3,8 +3,9 @@ import itertools
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
 import json
-
+import re
 import helpers.ngrams, helpers.tfidf
+
 
 # needs to be defined
 
@@ -33,8 +34,10 @@ def documentCheckPhrases():
 
 @app.route('/doc', methods=['POST'])
 def similarDocs():
-    doc = request.json["doc"]   
-    DOCS.append(gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=['current_doc']))    
+    # model = gensim.models.doc2vec.Doc2Vec.load_word2vec_format('tmp.bin')
+    doc = request.json["doc"] 
+    sentence = gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=['current_doc'])
+    DOCS.append(sentence)    
     model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=4)
     similar_docs = model.docvecs.most_similar('current_doc')
     return jsonify(similar_docs)
@@ -65,17 +68,34 @@ def loadModel(filename):
 def loadDocuments(filename):
     f = open(filename, 'r')
     logging.info("processing the document file")
-    tmp = []
+    url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    lines = []
     d = {}
-    i = 0
-    while i < 4:
-        for line in f:
-            print line
-            i = i + 1    
-            lines.append(line)
-    # for line1,line2 in itertools.izip_longest(*[f]*2):
-        # DOCS.append(gensim.models.doc2vec.LabeledSentence(words=line2.split(), tags=[line1]))
+    for line in f.xreadlines():
+        if re.match(url_regex,line):
+            d['url'] = line.strip()
+        elif not line.isspace():
+            d['doc'] = line
+            lines.append(d)
+             
+            d = {}      
+    f.close()  
     logging.info("finished processing document file")
+    processLines(lines)      
+
+def processLines(lines):
+    logging.info("processing the docs")
+    i = 0
+    ls = lines[:len(lines)/4]
+    for l in ls:
+        url = l.get('url', None)
+        doc = l.get('doc', None)
+        if url and doc:
+            # print "i is %s" %i
+            doc = gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url])
+            DOCS.append(doc)
+        i = i + 1    
+    logging.info("finished processing the docs")        
 
 def checkProximity(phrase, notwords = None):
 
@@ -105,7 +125,7 @@ if __name__ == "__main__":
         print("./word-2-vec-service <training-set> <document-set>")
         sys.exit(1)
 
-    app.config['MODEL'] = loadModel(sys.argv[1])
+    # app.config['MODEL'] = loadModel(sys.argv[1])
     if sys.argv[2]:
         logging.info('document set')
         app.config['DOCS'] = loadDocuments(sys.argv[2])
