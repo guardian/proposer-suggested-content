@@ -1,12 +1,19 @@
-import gensim, logging, sys
-import itertools
+import gensim, logging, sys, itertools, argparse, json
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
-import json
+
 
 import helpers.ngrams, helpers.tfidf
 
 # needs to be defined
+
+# set up the command line args
+parser = argparse.ArgumentParser(description="Run word2vec and doc2vec in an HTTP service")
+parser.add_argument('word2vec', type=str,
+                    help="A pretrained word2vec binary file")
+parser.add_argument('--doc2vec', type=str, required=False, dest="doc2vec",
+                    help="The docs in text format for doc to vec")
+
 
 
 app = Flask(__name__)
@@ -33,8 +40,8 @@ def documentCheckPhrases():
 
 @app.route('/doc', methods=['POST'])
 def similarDocs():
-    doc = request.json["doc"]   
-    DOCS.append(gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=['current_doc']))    
+    doc = request.json["doc"]
+    DOCS.append(gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=['current_doc']))
     model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=4)
     similar_docs = model.docvecs.most_similar('current_doc')
     return jsonify(similar_docs)
@@ -67,7 +74,7 @@ def loadDocuments(filename):
 	for line1,line2 in itertools.izip_longest(*[f]*2):
 		logging.info("processing the document file")
 		DOCS.append(gensim.models.doc2vec.LabeledSentence(words=line2.split(), tags=[line1]))
-		logging.info("finished processing document file")        
+		logging.info("finished processing document file")
 
 def checkProximity(phrase, notwords = None):
 
@@ -93,12 +100,13 @@ def checkProximity(phrase, notwords = None):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("./word-2-vec-service <training-set> <document-set>")
-        sys.exit(1)
+    args = vars(parser.parse_args())
+    print(args)
+    app.config['MODEL'] = loadModel(args['word2vec'])
 
-    app.config['MODEL'] = loadModel(sys.argv[1])
-    if sys.argv[2]:
+
+    if args['doc2vec']:
         logging.info('document set')
         app.config['DOCS'] = loadDocuments(sys.argv[2])
+
     app.run(host='0.0.0.0', port=9000, threaded=True)
