@@ -1,13 +1,6 @@
-import gensim, logging, sys, itertools, argparse, json
+import gensim, logging, sys, itertools, argparse, json, re
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
-<<<<<<< HEAD
-import json
-import re
-=======
-
-
->>>>>>> master
 import helpers.ngrams, helpers.tfidf
 
 
@@ -46,7 +39,7 @@ def documentCheckPhrases():
 
 @app.route('/doc', methods=['POST'])
 def similarDocs():
-    model = gensim.models.doc2vec.Doc2Vec.load('docs_tmp.bin')
+    model = app.config["DOCS"]
     doc = request.json["doc"] 
     new_doc_vec = model.infer_vector(doc.split())
     similar_docs = model.docvecs.most_similar([new_doc_vec])
@@ -74,6 +67,9 @@ def query():
 
 def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
+
+def loadDocsBinary(filename):
+    return gensim.models.doc2vec.Doc2Vec.load(filename)    
 
 def loadDocuments(filename):
     f = open(filename, 'r')
@@ -138,6 +134,6 @@ if __name__ == "__main__":
 
     if args['doc2vec']:
         logging.info('document set')
-        app.config['DOCS'] = loadDocuments(sys.argv[2])
+        app.config['DOCS'] = loadDocsBinary(args['doc2vec'])
 
     app.run(host='0.0.0.0', port=9000, threaded=True)
