@@ -352,6 +352,10 @@
                             "/home/proposer-suggested-content/doc2vec.bin": {
                                 "source" : {"Ref": "TrainingSetDocsS3Url"},
                                 "authenticaion": "trainingSetAuthentication"
+                            },
+                            "/home/proposer-suggested-content/capi-dump-docs": {
+                                "source" : {"Ref": "CapiDump"},
+                                "authenticaion": "trainingSetAuthentication"
                             }
                         }
                     }
