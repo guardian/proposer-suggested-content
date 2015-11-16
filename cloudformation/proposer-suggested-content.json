@@ -133,7 +133,7 @@
                                     ]
                                 ]
                             }
-                                        ]
+                            ]
 
                         }
                     ]
@@ -237,14 +237,7 @@
                 "SecurityGroups": [
                     {
                         "Fn::GetAtt":
-
-
-
-
-
-
-
- [
+                    [
                             "LoadBalancerSecurityGroup",
                             "GroupId"
                         ]
@@ -352,6 +345,10 @@
                             "/home/proposer-suggested-content/doc2vec.bin": {
                                 "source" : {"Ref": "TrainingSetDocsS3Url"},
                                 "authenticaion": "trainingSetAuthentication"
+                            },
+                            "/home/proposer-suggested-content/capi-dump-docs.txt": {
+                                "source" : {"Ref": "TrainingSetDocsS3Url"},
+                                "authenticaion": "trainingSetAuthentication"
                             }
                         }
                     }
@@ -365,7 +362,7 @@
                     {"Ref": "SSHSecurityGroup"},
                     {"Ref": "PingSecurityGroup"}
                 ],
-                "InstanceType": "t2.medium",
+                "InstanceType": "m4.xlarge",
                 "IamInstanceProfile": {"Ref": "ProposerSuggestedContentInstanceProfile"},
                 "UserData": {
                     "Fn::Base64": {
@@ -392,7 +389,7 @@
                                 " || error_exit 'Failed to run cfn-init'\n",
                                 "cd /home/proposer-suggested-content\n",
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
-                                "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin --doc2vec /home/proposer-suggested-content/doc2vec.bin  > suggested-content/suggested-content.log"
+                                "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin --doctrain /home/proposer-suggested-content/capi-dump-docs.txt  > suggested-content/suggested-content.log"
                             ]
                         ]
                     }
