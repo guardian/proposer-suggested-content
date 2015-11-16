@@ -1,13 +1,25 @@
-import gensim, logging, sys
-import itertools
+import gensim, logging, sys, itertools, argparse, json
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
+<<<<<<< HEAD
 import json
 import re
+=======
+
+
+>>>>>>> master
 import helpers.ngrams, helpers.tfidf
 
 
 # needs to be defined
+
+# set up the command line args
+parser = argparse.ArgumentParser(description="Run word2vec and doc2vec in an HTTP service")
+parser.add_argument('word2vec', type=str,
+                    help="A pretrained word2vec binary file")
+parser.add_argument('--doc2vec', type=str, required=False, dest="doc2vec",
+                    help="The docs in text format for doc to vec")
+
 
 
 app = Flask(__name__)
@@ -34,10 +46,17 @@ def documentCheckPhrases():
 
 @app.route('/doc', methods=['POST'])
 def similarDocs():
+<<<<<<< HEAD
     model = gensim.models.doc2vec.Doc2Vec.load('docs_tmp.bin')
     doc = request.json["doc"] 
     new_doc_vec = model.infer_vector(doc.split())
     similar_docs = model.docvecs.most_similar([new_doc_vec])
+=======
+    doc = request.json["doc"]
+    DOCS.append(gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=['current_doc']))
+    model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=4)
+    similar_docs = model.docvecs.most_similar('current_doc')
+>>>>>>> master
     return jsonify(similar_docs)
 
 
@@ -64,6 +83,7 @@ def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
 
 def loadDocuments(filename):
+<<<<<<< HEAD
     f = open(filename, 'r')
     logging.info("processing the document file")
     url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
@@ -121,12 +141,11 @@ def checkProximity(phrase, notwords = None):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("./word-2-vec-service <training-set> <document-set>")
-        sys.exit(1)
+    args = vars(parser.parse_args())
+    app.config['MODEL'] = loadModel(args['word2vec'])
 
-    # app.config['MODEL'] = loadModel(sys.argv[1])
-    if sys.argv[2]:
+    if args['doc2vec']:
         logging.info('document set')
         app.config['DOCS'] = loadDocuments(sys.argv[2])
+
     app.run(host='0.0.0.0', port=9000, threaded=True)
