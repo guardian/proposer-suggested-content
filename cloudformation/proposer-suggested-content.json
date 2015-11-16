@@ -362,7 +362,7 @@
                     {"Ref": "SSHSecurityGroup"},
                     {"Ref": "PingSecurityGroup"}
                 ],
-                "InstanceType": "m4.xlarge",
+                "InstanceType": "m4.4xlarge",
                 "IamInstanceProfile": {"Ref": "ProposerSuggestedContentInstanceProfile"},
                 "UserData": {
                     "Fn::Base64": {
