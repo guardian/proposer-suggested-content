@@ -40,10 +40,15 @@
             "Type": "String",
             "Default": "proposer-capi-snapshots"
         },
-        "TrainingSetS3Url": {
+        "TrainingSetWordsS3Url": {
             "Description": "The url to download the training set",
             "Type": "String",
             "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/2015-10-26T15%3A34%3A54%2B00%3A00/capi-phrases-lowercase.bin"
+        },
+        "TrainingSetDocsS3Url": {
+            "Description": "The url to download the training set",
+            "Type": "String",
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/docs_tmp.bin"
         }
     },
     "Mappings": {
@@ -335,11 +340,14 @@
                                 },
                                 "authentication": "distributionAuthentication"
                             },
-                            "/home/proposer-suggested-content/training-set.bin": {
-                                "source" : {"Ref": "TrainingSetS3Url"},
+                            "/home/proposer-suggested-content/word2vec.bin": {
+                                "source" : {"Ref": "TrainingSetWordsS3Url"},
+                                "authenticaion": "trainingSetAuthentication"
+                            },
+                            "/home/proposer-suggested-content/doc2vec.bin": {
+                                "source" : {"Ref": "TrainingSetDocsS3Url"},
                                 "authenticaion": "trainingSetAuthentication"
                             }
-
                         }
                     }
                 }
@@ -379,7 +387,7 @@
                                 " || error_exit 'Failed to run cfn-init'\n",
                                 "cd /home/proposer-suggested-content\n",
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
-                                "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/training-set.bin\n > suggested-content/suggested-content.log"
+                                "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin\n --doc2vec /home/proposer-suggested-content/doc2vec.bin > suggested-content/suggested-content.log"
                             ]
                         ]
                     }
