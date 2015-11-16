@@ -34,12 +34,10 @@ def documentCheckPhrases():
 
 @app.route('/doc', methods=['POST'])
 def similarDocs():
-    # model = gensim.models.doc2vec.Doc2Vec.load_word2vec_format('tmp.bin')
+    model = gensim.models.doc2vec.Doc2Vec.load('docs_tmp.bin')
     doc = request.json["doc"] 
-    sentence = gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=['current_doc'])
-    DOCS.append(sentence)    
-    model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=4)
-    similar_docs = model.docvecs.most_similar('current_doc')
+    new_doc_vec = model.infer_vector(doc.split())
+    similar_docs = model.docvecs.most_similar([new_doc_vec])
     return jsonify(similar_docs)
 
 
@@ -94,7 +92,9 @@ def processLines(lines):
             # print "i is %s" %i
             doc = gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url])
             DOCS.append(doc)
-        i = i + 1    
+        i = i + 1  
+    model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=4)      
+    model.save('docs_tmp.bin')
     logging.info("finished processing the docs")        
 
 def checkProximity(phrase, notwords = None):
