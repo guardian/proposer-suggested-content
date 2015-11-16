@@ -11,9 +11,9 @@ parser = argparse.ArgumentParser(description="Run word2vec and doc2vec in an HTT
 parser.add_argument('word2vec', type=str,
                     help="A pretrained word2vec binary file")
 parser.add_argument('--doc2vec', type=str, required=False, dest="doc2vec",
-                    help="The docs in text format for doc to vec")
-parser.add_argument('--doctrain', type=str, required=False, dest="doc2vec",
-                    help="The docs in text format for doc to vec")
+                    help="Passing in document")
+parser.add_argument('--doctrain', type=str, required=False, dest="doctrain",
+                    help="Trains docs in the text format to doc to vec")
 
 
 app = Flask(__name__)
