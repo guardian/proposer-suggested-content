@@ -92,16 +92,20 @@ def loadDocuments(filename):
 def processLines(lines):
     logging.info("processing the docs")
     i = 0
-    ls = lines[:len(lines)/4]
-    for l in ls:
+    f = open('log.txt', 'a')
+    for l in lines:
         url = l.get('url', None)
         doc = l.get('doc', None)
         if url and doc:
-            # print "i is %s" %i
             doc = gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url])
             DOCS.append(doc)
-        i = i + 1  
-    model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=4)      
+        i = i + 1
+        f.write(str(i))
+        f.write('\n')
+
+    f.close()    
+    logging.info('performing training')        
+    model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=20)      
     model.save('docs_tmp.bin')
     logging.info("finished processing the docs")        
 
@@ -130,10 +134,10 @@ def checkProximity(phrase, notwords = None):
 
 if __name__ == "__main__":
     args = vars(parser.parse_args())
-    app.config['MODEL'] = loadModel(args['word2vec'])
+    # app.config['MODEL'] = loadModel(args['word2vec'])
 
     if args['doc2vec']:
         logging.info('document set')
-        app.config['DOCS'] = loadDocsBinary(args['doc2vec'])
+        app.config['DOCS'] = loadDocuments(args['doc2vec'])
 
     app.run(host='0.0.0.0', port=9000, threaded=True)
