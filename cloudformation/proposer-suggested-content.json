@@ -347,7 +347,7 @@
                                 "authenticaion": "trainingSetAuthentication"
                             },
                             "/home/proposer-suggested-content/capi-dump-docs.txt": {
-                                "source" : {"Ref": "TrainingSetDocsS3Url"},
+                                "source" : {"Ref": "CapiDump"},
                                 "authenticaion": "trainingSetAuthentication"
                             }
                         }
