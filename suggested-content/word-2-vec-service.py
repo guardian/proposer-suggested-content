@@ -12,7 +12,8 @@ parser.add_argument('word2vec', type=str,
                     help="A pretrained word2vec binary file")
 parser.add_argument('--doc2vec', type=str, required=False, dest="doc2vec",
                     help="The docs in text format for doc to vec")
-
+parser.add_argument('--doctrain', type=str, required=False, dest="doc2vec",
+                    help="The docs in text format for doc to vec")
 
 
 app = Flask(__name__)
@@ -83,7 +84,6 @@ def loadDocuments(filename):
         elif not line.isspace():
             d['doc'] = line
             lines.append(d)
-             
             d = {}      
     f.close()  
     logging.info("finished processing document file")
@@ -102,7 +102,6 @@ def processLines(lines):
         i = i + 1
         f.write(str(i))
         f.write('\n')
-
     f.close()    
     logging.info('performing training')        
     model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=20)      
@@ -138,6 +137,10 @@ if __name__ == "__main__":
 
     if args['doc2vec']:
         logging.info('document set')
-        app.config['DOCS'] = loadDocuments(args['doc2vec'])
+        app.config['DOCS'] = loadDocsBinary(args['doc2vec'])
+
+    if args['doctrain']:
+        logging.info('training set')
+        app.config['DOCS'] = loadDocuments(args['doctrain']) 
 
     app.run(host='0.0.0.0', port=9000, threaded=True)

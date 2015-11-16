@@ -49,6 +49,11 @@
             "Description": "The url to download the training set",
             "Type": "String",
             "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/docs_tmp.bin"
+        },
+        "CapiDump": {
+            "Description": "The url to download the training set",
+            "Type": "String",
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-dump-docs"
         }
     },
     "Mappings": {
@@ -387,7 +392,7 @@
                                 " || error_exit 'Failed to run cfn-init'\n",
                                 "cd /home/proposer-suggested-content\n",
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
-                                "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin\n --doc2vec /home/proposer-suggested-content/doc2vec.bin > suggested-content/suggested-content.log"
+                                "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin\n --doc2vec /home/proposer-suggested-content/doc2vec.bin --doctrain /home/proposer-suggested-content/capi-dump-docs > suggested-content/suggested-content.log"
                             ]
                         ]
                     }
