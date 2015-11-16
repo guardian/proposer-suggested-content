@@ -46,17 +46,10 @@ def documentCheckPhrases():
 
 @app.route('/doc', methods=['POST'])
 def similarDocs():
-<<<<<<< HEAD
     model = gensim.models.doc2vec.Doc2Vec.load('docs_tmp.bin')
     doc = request.json["doc"] 
     new_doc_vec = model.infer_vector(doc.split())
     similar_docs = model.docvecs.most_similar([new_doc_vec])
-=======
-    doc = request.json["doc"]
-    DOCS.append(gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=['current_doc']))
-    model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=4)
-    similar_docs = model.docvecs.most_similar('current_doc')
->>>>>>> master
     return jsonify(similar_docs)
 
 
@@ -83,7 +76,6 @@ def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
 
 def loadDocuments(filename):
-<<<<<<< HEAD
     f = open(filename, 'r')
     logging.info("processing the document file")
     url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
