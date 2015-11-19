@@ -380,7 +380,7 @@
                                 " || error_exit 'Failed to run cfn-init'\n",
                                 "cd /home/proposer-suggested-content\n",
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
-                                "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin --doc2vec /home/proposer-suggested-content/doc2vec.bin  > suggested-content/suggested-content.log"
+                                "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin  > suggested-content/suggested-content.log"
                             ]
                         ]
                     }
