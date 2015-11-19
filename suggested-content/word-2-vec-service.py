@@ -106,8 +106,6 @@ def createModel(lines):
     new_doc_vec = model.infer_vector('testing')
     similar_docs = model.docvecs.most_similar([new_doc_vec])
 
-    print similar_docs
-
     model.save('capi_docs.bin')
     logging.info("finished processing the docs")        
 

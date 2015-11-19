@@ -48,7 +48,7 @@
         "TrainingSetDocsS3Url": {
             "Description": "The url to download the training set",
             "Type": "String",
-            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/docs_tmp.bin"
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-docs/capi_docs.bin"
         }
     },
     "Mappings": {
@@ -341,7 +341,6 @@
                                 "source" : {"Ref": "TrainingSetDocsS3Url"},
                                 "authenticaion": "trainingSetAuthentication"
                             }
-                        }
                     }
                 }
             },
