@@ -341,6 +341,7 @@
                                 "source" : {"Ref": "TrainingSetDocsS3Url"},
                                 "authenticaion": "trainingSetAuthentication"
                             }
+                        }    
                     }
                 }
             },
