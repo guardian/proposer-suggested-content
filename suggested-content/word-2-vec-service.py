@@ -87,25 +87,28 @@ def loadDocuments(filename):
             d = {}      
     f.close()  
     logging.info("finished processing document file")
-    processLines(lines)      
+    return lines
 
-def processLines(lines):
+def createSentences(lines):
     logging.info("processing the docs")
-    i = 0
-    f = open('log.txt', 'a')
     for l in lines:
         url = l.get('url', None)
         doc = l.get('doc', None)
+
         if url and doc:
-            doc = gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url])
-            DOCS.append(doc)
-        i = i + 1
-        f.write(str(i))
-        f.write('\n')
-    f.close()    
+            yield gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url])
+    
+def createModel(lines):
     logging.info('performing training')        
-    model = gensim.models.Doc2Vec(DOCS, size=100, window=8, min_count=5, workers=20)      
-    model.save('docs_tmp.bin')
+    model = gensim.models.Doc2Vec(size=100, window=8, min_count=5, workers=20)  
+
+    model.build_vocab(createSentences(lines))
+    new_doc_vec = model.infer_vector('testing')
+    similar_docs = model.docvecs.most_similar([new_doc_vec])
+
+    print similar_docs
+
+    model.save('capi_docs.bin')
     logging.info("finished processing the docs")        
 
 def checkProximity(phrase, notwords = None):
@@ -141,6 +144,9 @@ if __name__ == "__main__":
 
     if args['doctrain']:
         logging.info('training set')
-        app.config['DOCS'] = loadDocuments(args['doctrain']) 
+        lines = loadDocuments(args['doctrain'])
+        createModel(lines)
+        
+
 
     app.run(host='0.0.0.0', port=9000, threaded=True)
