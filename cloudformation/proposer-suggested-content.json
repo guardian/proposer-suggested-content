@@ -356,7 +356,7 @@
                                 "authenticaion": "trainingSetAuthentication"
                             },
                             "/home/proposer-suggested-content/capi-docs.zip": {
-                                "source" : {"Ref": "SampleDocsS3Url"},
+                                "source" : {"Ref": "CapiZip"},
                                 "authenticaion": "trainingSetAuthentication"
                             }
 
@@ -399,7 +399,7 @@
                                 {"Ref": "AWS::Region"},
                                 " || error_exit 'Failed to run cfn-init'\n",
                                 "cd /home/proposer-suggested-content\n",
-                                "unzip /home/proposer-suggested-content/capi-docs.zip\n",
+                                // "unzip /home/proposer-suggested-content/capi-docs.zip\n",
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
                                 "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin --doc2vec /home/proposer-suggested-content/sample_docs.bin > suggested-content/suggested-content.log"
                             ]
