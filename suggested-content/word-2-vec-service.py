@@ -40,10 +40,12 @@ def documentCheckPhrases():
 
 @app.route('/doc', methods=['POST'])
 def similarDocs():
-    model = app.config["DOCS"]
     doc = request.json["doc"] 
-    new_doc_vec = model.infer_vector(doc.split())
-    similar_docs = model.docvecs.most_similar([new_doc_vec])
+    models = app.config["DOCS"]
+    similar_docs = []
+    for model in models:
+        new_doc_vec = model.infer_vector(doc.split())
+        similar_docs.extend(model.docvecs.most_similar([new_doc_vec]))
     return jsonify(similar_docs)
 
 
@@ -69,8 +71,11 @@ def query():
 def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
 
-def loadDocsBinary(filename):
-    return gensim.models.doc2vec.Doc2Vec.load(filename)    
+def loadDocsBinary(filenames):
+    models = []
+    for f in filenames:
+        models.append(gensim.models.doc2vec.Doc2Vec.load(f))
+    return models
 
 def loadDocuments(filename):
     f = open(filename, 'r')
@@ -87,7 +92,7 @@ def loadDocuments(filename):
             d = {}      
     f.close()  
     logging.info("finished processing document file")
-    return lines
+    createModel(lines, filename)
 
 def createSentences(lines):
     logging.info("processing the docs")
@@ -98,15 +103,15 @@ def createSentences(lines):
         if url and doc:
             yield gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url])
     
-def createModel(lines):
+def createModel(lines, filename):
     logging.info('performing training')        
     model = gensim.models.Doc2Vec(size=100, window=8, min_count=5, workers=20)  
 
     model.build_vocab(createSentences(lines))
     new_doc_vec = model.infer_vector('testing')
     similar_docs = model.docvecs.most_similar([new_doc_vec])
-
-    model.save('capi_docs.bin')
+    output = '%s.bin' %filename
+    model.save(output)
     logging.info("finished processing the docs")        
 
 def checkProximity(phrase, notwords = None):
@@ -138,12 +143,14 @@ if __name__ == "__main__":
 
     if args['doc2vec']:
         logging.info('document set')
-        app.config['DOCS'] = loadDocsBinary(args['doc2vec'])
+        files = args['doc2vec'].split(',')
+        app.config['DOCS'] = loadDocsBinary(files)
 
     if args['doctrain']:
         logging.info('training set')
+
         lines = loadDocuments(args['doctrain'])
-        createModel(lines)
+        
         
 
 
