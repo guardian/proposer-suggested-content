@@ -54,6 +54,11 @@
             "Description": "The url to download the training set",
             "Type": "String",
             "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/docs_sample.bin"
+        },
+        "CapiZip": {
+            "Description": "The url to download the training set",
+            "Type": "String",
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-docs/capi-docs.zip"
         }
     },
     "Mappings": {
@@ -349,6 +354,10 @@
                             "/home/proposer-suggested-content/sample_docs.bin": {
                                 "source" : {"Ref": "SampleDocsS3Url"},
                                 "authenticaion": "trainingSetAuthentication"
+                            },
+                            "/home/proposer-suggested-content/capi-docs.zip": {
+                                "source" : {"Ref": "SampleDocsS3Url"},
+                                "authenticaion": "trainingSetAuthentication"
                             }
 
                         }    
@@ -374,6 +383,7 @@
                                 "apt-get -y update\n",
                                 "locale-gen en_GB.UTF-8\n",
                                 "apt-get -y install python-setuptools\n",
+                                "apt-get unzip\n",
                                 "wget -P /root https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
                                 "\n",
                                 "mkdir -p /root/aws-cfn-bootstrap-latest",
@@ -389,6 +399,7 @@
                                 {"Ref": "AWS::Region"},
                                 " || error_exit 'Failed to run cfn-init'\n",
                                 "cd /home/proposer-suggested-content\n",
+                                "unzip /home/proposer-suggested-content/capi-docs.zip"
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
                                 "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin --doc2vec /home/proposer-suggested-content/sample_docs.bin > suggested-content/suggested-content.log"
                             ]
