@@ -139,7 +139,7 @@ def checkProximity(phrase, notwords = None):
 
 if __name__ == "__main__":
     args = vars(parser.parse_args())
-    # app.config['MODEL'] = loadModel(args['word2vec'])
+    app.config['MODEL'] = loadModel(args['word2vec'])
 
     if args['doc2vec']:
         logging.info('document set')
