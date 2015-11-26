@@ -55,10 +55,10 @@
             "Type": "String",
             "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/docs_sample.bin"
         },
-        "TestZip": {
+        "CapiZip": {
             "Description": "The url to download the training set",
             "Type": "String",
-            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-zip/zip-test.zip"
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-zip/capi-docs.zip"
         }
     },
     "Mappings": {
@@ -355,8 +355,8 @@
                                 "source" : {"Ref": "SampleDocsS3Url"},
                                 "authenticaion": "trainingSetAuthentication"
                             },
-                            "/home/proposer-suggested-content/zip-test.zip": {
-                                "source" : {"Ref": "TestZip"},
+                            "/home/proposer-suggested-content/capi-docs.zip": {
+                                "source" : {"Ref": "CapiZip"},
                                 "authenticaion": "trainingSetAuthentication"
                             }
 
@@ -399,7 +399,7 @@
                                 {"Ref": "AWS::Region"},
                                 " || error_exit 'Failed to run cfn-init'\n",
                                 "cd /home/proposer-suggested-content\n",
-                                "unzip /home/proposer-suggested-content/zip-test.zip"
+                                "unzip /home/proposer-suggested-content/capi-docs.zip"
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
                                 "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin --doc2vec /home/proposer-suggested-content/sample_docs.bin > suggested-content/suggested-content.log"
                             ]
