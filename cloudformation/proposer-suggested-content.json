@@ -367,7 +367,7 @@
                     "DeviceName": "/dev/sda1",
                     "Ebs" : {"VolumeSize": "40"}
                 }],
-                "InstanceType": "t2.medium",
+                "InstanceType": "m3.xlarge",
                 "IamInstanceProfile": {"Ref": "ProposerSuggestedContentInstanceProfile"},
                 "UserData": {
                     "Fn::Base64": {
