@@ -393,7 +393,6 @@
                                 " -r ProposerSuggestedContentLaunchConfig ",
                                 "  --region ",
                                 {"Ref": "AWS::Region"},
-                                "resize2fs /dev/sda1\n",
                                 " || error_exit 'Failed to run cfn-init'\n",
                                 "cd /home/proposer-suggested-content\n",
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
