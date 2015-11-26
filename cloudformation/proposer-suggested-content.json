@@ -396,7 +396,8 @@
                                 " || error_exit 'Failed to run cfn-init'\n",
                                 "cd /home/proposer-suggested-content\n",
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
-                                "python3 suggested-content/word-2-vec-service.py /home/proposer-suggested-content/word2vec.bin --doc2vec /home/proposer-suggested-content/sample_docs.bin > suggested-content/suggested-content.log"
+                                "unzip capi-docs.zip\n",
+                                "python3 suggested-content/word-2-vec-service.py word2vec.bin --doc2vec capi-1.bin,capi-2.bin,capi-3.bin,capi-4.bin > suggested-content/suggested-content.log"
                             ]
                         ]
                     }
