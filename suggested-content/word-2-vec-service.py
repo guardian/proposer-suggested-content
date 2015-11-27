@@ -88,26 +88,29 @@ def loadDocuments(filename):
             d = {}      
     f.close()  
     logging.info("finished processing document file")
-    createModel(lines, filename)
+    createModel(lines)
 
 def createSentences(lines):
     logging.info("processing the docs")
+    docs = []
     for l in lines:
         url = l.get('url', None)
         doc = l.get('doc', None)
-
         if url and doc:
-            yield gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url])
+            docs.append(gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url]))
+            # yield gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url])
+    return docs        
     
-def createModel(lines, filename):
-    logging.info('performing training')        
-    model = gensim.models.Doc2Vec(size=100, window=8, min_count=5, workers=20)  
-
-    model.build_vocab(createSentences(lines))
+def createModel(lines):
+    logging.info('performing training')   
+    docs = createSentences(lines)     
+    model = gensim.models.Doc2Vec(docs, size=100, window=8, min_count=5, workers=20)  
+    # model.build_vocab(createSentences(lines))
     new_doc_vec = model.infer_vector('testing')
     similar_docs = model.docvecs.most_similar([new_doc_vec])
-    output = '%s.bin' %filename
-    model.save(output)
+    print (similar_docs)
+    # output = '%s.bin' %filename
+    model.save('capi_docs.bin')
     logging.info("finished processing the docs")        
 
 def checkProximity(phrase, notwords = None):
@@ -135,7 +138,7 @@ def checkProximity(phrase, notwords = None):
 
 if __name__ == "__main__":
     args = vars(parser.parse_args())
-    app.config['MODEL'] = loadModel(args['word2vec'])
+    #app.config['MODEL'] = loadModel(args['word2vec'])
 
     if args['doc2vec']:
         logging.info('document set')
