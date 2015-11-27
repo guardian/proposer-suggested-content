@@ -41,11 +41,9 @@ def documentCheckPhrases():
 @app.route('/doc', methods=['POST'])
 def similarDocs():
     doc = request.json["doc"] 
-    models = app.config["DOCS"]
-    similar_docs = []
-    for model in models:
-        new_doc_vec = model.infer_vector(doc.split())
-        similar_docs.extend(model.docvecs.most_similar([new_doc_vec]))
+    model = app.config["DOCS"]
+    new_doc_vec = model.infer_vector(doc.split())
+    similar_docs = model.docvecs.most_similar([new_doc_vec])
     return jsonify(similar_docs)
 
 
@@ -71,11 +69,9 @@ def query():
 def loadModel(filename):
     return gensim.models.Word2Vec.load_word2vec_format(filename, binary=True)
 
-def loadDocsBinary(filenames):
-    models = []
-    for f in filenames:
-        models.append(gensim.models.doc2vec.Doc2Vec.load(f))
-    return models
+def loadDocsBinary(filename):
+    model = gensim.models.doc2vec.Doc2Vec.load(filename)
+    return model
 
 def loadDocuments(filename):
     f = open(filename, 'r')
@@ -143,8 +139,7 @@ if __name__ == "__main__":
 
     if args['doc2vec']:
         logging.info('document set')
-        files = args['doc2vec'].split(',')
-        app.config['DOCS'] = loadDocsBinary(files)
+        app.config['DOCS'] = loadDocsBinary(args['doc2vec'])
 
     if args['doctrain']:
         logging.info('training set')
