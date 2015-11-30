@@ -351,10 +351,6 @@
                                 "source" : {"Ref": "SampleDocsS3Url"},
                                 "authenticaion": "trainingSetAuthentication"
                             },
-                            "/home/proposer-suggested-content/capi-docs.zip": {
-                                "source" : {"Ref": "CapiZip"},
-                                "authenticaion": "trainingSetAuthentication"
-                            },
                             "/home/proposer-suggested-content/capi-dump-docs": {
                                 "source" : {"Ref": "CapiDump"},
                                 "authenticaion": "trainingSetAuthentication"
