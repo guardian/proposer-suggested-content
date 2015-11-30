@@ -2,6 +2,7 @@ import gensim, logging, sys, itertools, argparse, json, re
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
 import helpers.ngrams, helpers.tfidf
+from random import shuffle
 
 
 # needs to be defined
@@ -98,19 +99,23 @@ def createSentences(lines):
         doc = l.get('doc', None)
         if url and doc:
             docs.append(gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url]))
-            # yield gensim.models.doc2vec.LabeledSentence(words=doc.split(), tags=[url])
+    print ("HELLO ")        
+    shuffle(docs)
+    print ()        
     return docs        
     
 def createModel(lines):
     logging.info('performing training')   
-    docs = createSentences(lines)     
-    model = gensim.models.Doc2Vec(docs, size=100, window=8, min_count=5, workers=20)  
-    # model.build_vocab(createSentences(lines))
+    docs = createSentences(lines)   
+    model = gensim.models.Doc2Vec(size=100, window=8, min_count=5, workers=20)  
+    model.build_vocab(docs)
+    for epoch in range(20):
+        shuffle(docs)
+        model.train(docs)
     new_doc_vec = model.infer_vector('testing')
     similar_docs = model.docvecs.most_similar([new_doc_vec])
     print (similar_docs)
-    # output = '%s.bin' %filename
-    model.save('capi_docs.bin')
+    model.save('capi_docs_tweak.bin')
     logging.info("finished processing the docs")        
 
 def checkProximity(phrase, notwords = None):
