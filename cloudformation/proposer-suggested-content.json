@@ -53,7 +53,7 @@
         "CapiZip": {
             "Description": "The url to download the training set",
             "Type": "String",
-            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-zip/capi-dump-doc2vec.zip"
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-zip/capi_docs.zip"
         },
         "CapiDump": {
             "Description": "The url to download the training set",
@@ -406,6 +406,7 @@
                                 "cd /home/proposer-suggested-content\n",
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
                                 "python3 suggested-content/word-2-vec-service.py word2vec.bin --doctrain capi-dump-docs > suggested-content/suggested-content.log"
+
                             ]
                         ]
                     }
