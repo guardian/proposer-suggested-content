@@ -53,7 +53,7 @@
         "CapiZip": {
             "Description": "The url to download the training set",
             "Type": "String",
-            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-zip/capi-dump-doc2vec.zip"
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-zip/capi_docs.zip"
         }
     },
     "Mappings": {
