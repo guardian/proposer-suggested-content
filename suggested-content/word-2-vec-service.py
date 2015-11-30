@@ -44,7 +44,7 @@ def similarDocs():
     model = app.config["DOCS"]
     new_doc_vec = model.infer_vector(doc.split())
     similar_docs = model.docvecs.most_similar([new_doc_vec])
-    return jsonify(similar_docs)
+    return jsonify(results = [item[0] for item in similar_docs])
 
 
 @app.route('/check-phrases', methods=['POST'])
