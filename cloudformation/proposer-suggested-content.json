@@ -50,10 +50,30 @@
             "Type": "String",
             "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/docs_sample.bin"
         },
-        "CapiZip": {
+        "Doc2Vec1": {
             "Description": "The url to download the training set",
             "Type": "String",
-            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-zip/capi_docs.zip"
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-docs/capi_docs.bin"
+        },
+        "Doc2Vec2": {
+            "Description": "The url to download the training set",
+            "Type": "String",
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-docs/capi_docs.bin.docvecs.doctag_syn0.npy"
+        },
+        "Doc2Vec3": {
+            "Description": "The url to download the training set",
+            "Type": "String",
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-docs/capi_docs.bin.docvecs.doctag_syn0norm.npy"
+        },
+        "Doc2Vec4": {
+            "Description": "The url to download the training set",
+            "Type": "String",
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-docs/capi_docs.bin.syn0.npy"
+        },
+        "Doc2Vec5": {
+            "Description": "The url to download the training set",
+            "Type": "String",
+            "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-docs/capi_docs.bin.syn1.npy"
         }
     },
     "Mappings": {
@@ -346,8 +366,24 @@
                                 "source" : {"Ref": "SampleDocsS3Url"},
                                 "authenticaion": "trainingSetAuthentication"
                             },
-                            "/home/proposer-suggested-content/capi-docs.zip": {
-                                "source" : {"Ref": "CapiZip"},
+                            "/home/proposer-suggested-content/capi_docs.bin": {
+                                "source" : {"Ref": "Doc2Vec1"},
+                                "authenticaion": "trainingSetAuthentication"
+                            },
+                            "/home/proposer-suggested-content/capi_docs.bin.docvecs.doctag_syn0.npy": {
+                                "source" : {"Ref": "Doc2Vec2"},
+                                "authenticaion": "trainingSetAuthentication"
+                            },
+                            "/home/proposer-suggested-content/capi_docs.bin.docvecs.doctag_syn0norm.npy": {
+                                "source" : {"Ref": "Doc2Vec3"},
+                                "authenticaion": "trainingSetAuthentication"
+                            },
+                            "/home/proposer-suggested-content/capi_docs.bin.syn0.npy": {
+                                "source" : {"Ref": "Doc2Vec4"},
+                                "authenticaion": "trainingSetAuthentication"
+                            },
+                            "/home/proposer-suggested-content/capi_docs.bin.syn1.npy": {
+                                "source" : {"Ref": "Doc2Vec5"},
                                 "authenticaion": "trainingSetAuthentication"
                             }
 
@@ -379,7 +415,6 @@
                                 "apt-get -y update\n",
                                 "locale-gen en_GB.UTF-8\n",
                                 "apt-get -y install python-setuptools\n",
-                                "apt-get install unzip\n",
                                 "wget -P /root https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
                                 "\n",
                                 "mkdir -p /root/aws-cfn-bootstrap-latest",
@@ -396,7 +431,6 @@
                                 " || error_exit 'Failed to run cfn-init'\n",
                                 "cd /home/proposer-suggested-content\n",
                                 "tar -xf /home/proposer-suggested-content/proposer-suggested-content.tgz\n",
-                                "unzip capi-docs.zip\n",
                                 "python3 suggested-content/word-2-vec-service.py word2vec.bin --doc2vec capi_docs.bin > suggested-content/suggested-content.log"
                             ]
                         ]
