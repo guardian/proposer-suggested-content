@@ -45,9 +45,10 @@ def similarDocs():
     new_doc_vec = model.infer_vector(doc.split())
     similar_docs = model.docvecs.most_similar([new_doc_vec])
     logging.info('nearest docs %s ' %similar_docs)
-    filtered_docs = [doc for doc in similar_docs if doc[1] > 0.5]
+    filtered_docs = [doc for doc in similar_docs if doc[1] > 0.5 and "theguardian.com" in doc[0]]
     transformed_docs = map(lambda xy: {'url': xy[0], 'distance': round(xy[1], 2)}, filtered_docs)
     return jsonify(results = list(transformed_docs))
+
 
 
 @app.route('/check-phrases', methods=['POST'])
