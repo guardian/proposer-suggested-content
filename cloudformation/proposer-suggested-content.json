@@ -403,7 +403,7 @@
                     "DeviceName": "/dev/sda1",
                     "Ebs" : {"VolumeSize": "40"}
                 }],
-                "InstanceType": "m3.xlarge",
+                "InstanceType": "m3.medium",
                 "IamInstanceProfile": {"Ref": "ProposerSuggestedContentInstanceProfile"},
                 "UserData": {
                     "Fn::Base64": {
