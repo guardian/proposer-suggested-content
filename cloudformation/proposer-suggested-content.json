@@ -361,30 +361,6 @@
                             "/home/proposer-suggested-content/word2vec.bin": {
                                 "source" : {"Ref": "TrainingSetWordsS3Url"},
                                 "authenticaion": "trainingSetAuthentication"
-                            },
-                            "/home/proposer-suggested-content/sample_docs.bin": {
-                                "source" : {"Ref": "SampleDocsS3Url"},
-                                "authenticaion": "trainingSetAuthentication"
-                            },
-                            "/home/proposer-suggested-content/capi_docs.bin": {
-                                "source" : {"Ref": "Doc2Vec1"},
-                                "authenticaion": "trainingSetAuthentication"
-                            },
-                            "/home/proposer-suggested-content/capi_docs.bin.docvecs.doctag_syn0.npy": {
-                                "source" : {"Ref": "Doc2Vec2"},
-                                "authenticaion": "trainingSetAuthentication"
-                            },
-                            "/home/proposer-suggested-content/capi_docs.bin.docvecs.doctag_syn0norm.npy": {
-                                "source" : {"Ref": "Doc2Vec3"},
-                                "authenticaion": "trainingSetAuthentication"
-                            },
-                            "/home/proposer-suggested-content/capi_docs.bin.syn0.npy": {
-                                "source" : {"Ref": "Doc2Vec4"},
-                                "authenticaion": "trainingSetAuthentication"
-                            },
-                            "/home/proposer-suggested-content/capi_docs.bin.syn1.npy": {
-                                "source" : {"Ref": "Doc2Vec5"},
-                                "authenticaion": "trainingSetAuthentication"
                             }
 
                         }    
