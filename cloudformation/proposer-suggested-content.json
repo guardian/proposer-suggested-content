@@ -35,6 +35,10 @@
             "Type": "String",
             "Default": "77.91.248.0/21"
         },
+        "CertificateArn": {
+          "Description": "ARN of the SSL certificate for this service",
+          "Type": "String"
+        },
         "TrainingSetS3Bucket" : {
             "Description": "The bucket in S3 to train the server on",
             "Type": "String",
@@ -74,14 +78,6 @@
             "Description": "The url to download the training set",
             "Type": "String",
             "Default": "https://s3-eu-west-1.amazonaws.com/proposer-capi-snapshots/capi-docs/capi_docs.bin.syn1.npy"
-        }
-    },
-    "Mappings": {
-        "SSLCertificateId": {
-            "Environment": {
-                "CODE": "arn:aws:iam::743583969668:server-certificate/sites.code.dev-gutools.co.uk-exp2023-08-15",
-                "PROD": "arn:aws:iam::743583969668:server-certificate/star.gutools.co.uk-exp2018-11-17"
-            }
         }
     },
     "Resources": {
@@ -270,13 +266,7 @@
                         "LoadBalancerPort": "443",
                         "InstancePort": "9000",
                         "Protocol": "HTTPS",
-                        "SSLCertificateId": {
-                            "Fn::FindInMap": [
-                                "SSLCertificateId",
-                                "Environment",
-                                {"Ref": "Stage"}
-                            ]
-                        }
+                        "SSLCertificateId": {"Ref": "CertificateArn"}
                     }
                 ],
                 "HealthCheck": {
